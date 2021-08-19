@@ -1,15 +1,15 @@
-interface IProtocolIcon {
+export interface IProtocolIcon {
   adapter: string;
   size: string;
   url: string;
 }
 
-interface ITokenMarketPrice {
+export interface ITokenMarketPrice {
   currency: string;
   price: number;
 }
 
-interface IToken {
+export interface IToken {
   adapter: string;
   symbol: string;
   network: string;
@@ -17,7 +17,7 @@ interface IToken {
   marketPrices: number;
 }
 
-interface IProtocol {
+export interface IProtocol {
   cname: string;
   name: string;
   totalProposals: number;
@@ -27,20 +27,20 @@ interface IProtocol {
   tokens: IToken[];
 }
 
-interface IProposalTime {
+export interface IProposalTime {
   timestamp: number;
 }
 
-interface IProposalResult {
+export interface IProposalResult {
   total: number;
   choice: number;
 }
 
-interface IProposalVoteTime {
+export interface IProposalVoteTime {
   blockNumber: number;
 }
 
-interface IProposalVote {
+export interface IProposalVote {
   refId: string;
   proposalRefId: string;
   protocol: string;
@@ -54,7 +54,7 @@ interface IProposalVote {
   timestamp: number;
 }
 
-interface IProposal {
+export interface IProposal {
   refId: string;
   id: string;
   title: string;
@@ -75,7 +75,7 @@ interface IProposal {
   events: any;
 }
 
-interface IVoterProtocol {
+export interface IVoterProtocol {
   protocol: string;
   totalVotesCast: number;
   lastVoteCast: number;
@@ -83,7 +83,7 @@ interface IVoterProtocol {
   totalPowerCast: number;
 }
 
-interface IVoter {
+export interface IVoter {
   address: string;
   firstVoteCast: number;
   lastVoteCast: number;
@@ -91,13 +91,50 @@ interface IVoter {
   protocols: IVoterProtocol[];
 }
 
-interface IVoterVote extends IProposalVote {
+export interface IVoterVote extends IProposalVote {
   proposalInfo: IProposal;
 }
 
-interface IGlobalStats {
+export interface IGlobalStats {
   totalProposals: number;
   totalProtocols: number;
   totalUniqueVoters: number;
   totalVotesCast: number;
+}
+
+export interface SuccessResponse<T> {
+  data: T;
+}
+
+// Looks like DynamoDB!
+
+export interface ListSuccessResponse<T> extends SuccessResponse<T> {
+  nextToken: number;
+}
+
+export interface PaginationOtions {
+  cursor?: number;
+  limit?: number;
+}
+
+export interface ListProtocolOptions extends PaginationOtions {
+  pinned?: string[];
+  cnames?: string[];
+}
+
+export interface ListProposalsOptions extends PaginationOtions {
+  cname?: string[];
+  status?: 'pending' | 'active' | 'closed';
+}
+
+export interface ListProtocolProposalsOptions extends PaginationOtions {
+  status?: 'pending' | 'active' | 'closed';
+}
+
+export interface ListProposalsVotesOptions extends PaginationOtions {
+  pinned?: string[];
+}
+
+export interface ListVoterVotesOptions extends PaginationOtions {
+  cname?: string[];
 }
