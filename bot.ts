@@ -41,7 +41,9 @@ bot.on('interactionCreate', async (interaction) => {
 
   const command = localCommands.find(command => command.name === interaction.commandName);
   if (command) {
-    command.handler({ interaction, boardroomApi });
+    console.log(`Executing command: ${interaction.commandName}`);
+    await command.handler({ interaction, boardroomApi });
+    console.log('Ran successfully.');
   } else {
     console.log(`Could not find command: ${interaction.commandName}`);
   }
