@@ -1,3 +1,8 @@
+// SCHEMA
+
+import { CommandInteraction } from "discord.js";
+import BoardRoomApiService from "./boardRoomApiService";
+
 export interface IProtocolIcon {
   adapter: string;
   size: string;
@@ -101,6 +106,30 @@ export interface IGlobalStats {
   totalUniqueVoters: number;
   totalVotesCast: number;
 }
+
+// COMMANDS
+
+export type ICommandHandlerArguments = {
+  interaction: CommandInteraction;
+  boardroomApi: BoardRoomApiService;
+}
+
+export type ICommandHandler = (args: ICommandHandlerArguments) => Promise<void> | void;
+
+export interface ICommandOption {
+  name: string;
+  description: string;
+}
+
+export interface ICommand { 
+  name: string;
+  description: string;
+  required?: boolean;
+  options?: ICommandOption[];
+  handler: ICommandHandler;
+}
+
+//////// API
 
 export interface SuccessResponse<T> {
   data: T;
