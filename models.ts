@@ -65,7 +65,7 @@ export interface IProposal {
   title: string;
   content: string;
   protocol: string;
-  adaptar: string;
+  adapter: string;
   proposer: string;
   totalVotes: number;
   blockNumber: number;

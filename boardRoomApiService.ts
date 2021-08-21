@@ -39,7 +39,7 @@ class BoardRoomApiService {
     return result;
   }
 
-  async listProtocolVoters(cname: string, options?: PaginationOtions): Promise<ListSuccessResponse<IProposal[]>> {
+  async listProtocolVoters(cname: string, options?: PaginationOtions): Promise<ListSuccessResponse<IVoter[]>> {
     const queryString = buildQueryString({ ...options });
     const response = await fetch(`${API_URL}/protocols/${cname}/voters?${queryString}`);
     const result = await response.json();
@@ -52,7 +52,7 @@ class BoardRoomApiService {
 
   async listProposalVotes(refId: string, options?: ListProposalsVotesOptions): Promise<ListSuccessResponse<IProposalVote[]>> {
     const queryString = buildQueryString({ ...options });
-    const response = await fetch(`${API_URL}/protocols/${refId}/votes?${queryString}`);
+    const response = await fetch(`${API_URL}/proposals/${refId}/votes?${queryString}`);
     const result = await response.json();
     if (result.message) {
       throw new Error(result.message);
@@ -94,7 +94,17 @@ class BoardRoomApiService {
   }
 
   async getProposalDetails(refId: string): Promise<SuccessResponse<IProposal>> {
-    const response = await fetch(`${API_URL}/protocols/${refId}`);
+    const response = await fetch(`${API_URL}/proposals/${refId}`);
+    const result = await response.json();
+    if (result.message) {
+      throw new Error(result.message);
+    }
+
+    return result;
+  }
+
+  async getVoter(address: string): Promise<SuccessResponse<IVoter>> {
+    const response = await fetch(`${API_URL}/voters/${address}`);
     const result = await response.json();
     if (result.message) {
       throw new Error(result.message);
