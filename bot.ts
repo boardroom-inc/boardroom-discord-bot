@@ -19,7 +19,7 @@ const boardroomApi = new BoardRoomApiService();
 const commands = localCommands.map(localCommand => {
   const { name, description } = localCommand;
   const options: Discord.ApplicationCommandOptionData[] = (localCommand.options || []).map(localOption => {
-    return { name: localOption.name, description: localOption.description, type: 'STRING' };
+    return { name: localOption.name, description: localOption.description, type: 'STRING', required: true };
   });
 
   const command: Discord.ApplicationCommandData = { name, description, options };
