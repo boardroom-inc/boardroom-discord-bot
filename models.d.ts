@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, TextBasedChannels } from "discord.js";
 import BoardRoomApiService from "./boardRoomApiService";
 export interface IProtocolIcon {
     adapter: string;
@@ -94,11 +94,14 @@ export interface IGlobalStats {
 export declare type ICommandHandlerArguments = {
     interaction: CommandInteraction;
     boardroomApi: BoardRoomApiService;
+    subscriptions: ISubscription[];
 };
 export declare type ICommandHandler = (args: ICommandHandlerArguments) => Promise<void> | void;
 export interface ICommandOption {
     name: string;
     description: string;
+    type?: ApplicationCommandOptionType;
+    required?: boolean;
 }
 export interface ICommand {
     name: string;
@@ -134,3 +137,37 @@ export interface ListProposalsVotesOptions extends PaginationOtions {
 export interface ListVoterVotesOptions extends PaginationOtions {
     cname?: string[];
 }
+export declare type ISubscriptionBase = {
+    frequency: number;
+    lastCheck: Date;
+    channel: TextBasedChannels;
+};
+export declare type ISubscriptionNewProtocol = {
+    type: 'new_protocol';
+    protocols: IProtocol[];
+};
+export declare type ISubscriptionNewProposal = {
+    type: 'new_proposal';
+    cname: string;
+    proposals: IProposal[];
+};
+export declare type ISubscriptionProposalVotes = {
+    type: 'new_proposal_vote';
+    refId: string;
+    proposalVotes: IProposalVote[];
+};
+export declare type ISubscriptionVoterVotes = {
+    type: 'new_voter_vote';
+    address: string;
+    voterVotes: IVoterVote[];
+};
+export declare type ISubscriptionProposalState = {
+    type: 'proposal_state';
+    refId: string;
+    proposal: IProposal;
+};
+export declare type ISubscriptionStats = {
+    type: 'stats';
+    stats: IGlobalStats;
+};
+export declare type ISubscription = ISubscriptionBase & (ISubscriptionNewProtocol | ISubscriptionNewProposal | ISubscriptionVoterVotes | ISubscriptionProposalVotes | ISubscriptionProposalState | ISubscriptionStats);

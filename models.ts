@@ -1,6 +1,7 @@
 // SCHEMA
 
-import { CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, TextBasedChannels } from "discord.js";
+import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
 import BoardRoomApiService from "./boardRoomApiService";
 
 export interface IProtocolIcon {
@@ -112,6 +113,7 @@ export interface IGlobalStats {
 export type ICommandHandlerArguments = {
   interaction: CommandInteraction;
   boardroomApi: BoardRoomApiService;
+  subscriptions: ISubscription[];
 }
 
 export type ICommandHandler = (args: ICommandHandlerArguments) => Promise<void> | void;
@@ -119,6 +121,8 @@ export type ICommandHandler = (args: ICommandHandlerArguments) => Promise<void> 
 export interface ICommandOption {
   name: string;
   description: string;
+  type?: ApplicationCommandOptionType;
+  required?: boolean;
 }
 
 export interface ICommand { 
@@ -167,3 +171,54 @@ export interface ListProposalsVotesOptions extends PaginationOtions {
 export interface ListVoterVotesOptions extends PaginationOtions {
   cname?: string[];
 }
+
+// Subscriptions
+
+export type ISubscriptionBase = {
+  frequency: number;
+  lastCheck: Date;
+  channel: TextBasedChannels;
+};
+
+export type ISubscriptionNewProtocol = {
+  type: 'new_protocol';
+  protocols: IProtocol[];
+};
+
+export type ISubscriptionNewProposal = {
+  type: 'new_proposal';
+  cname: string;
+  proposals: IProposal[];
+};
+
+export type ISubscriptionProposalVotes = {
+  type: 'new_proposal_vote';
+  refId: string;
+  proposalVotes: IProposalVote[];
+};
+
+export type ISubscriptionVoterVotes = {
+  type: 'new_voter_vote';
+  address: string;
+  voterVotes: IVoterVote[];
+};
+
+export type ISubscriptionProposalState = {
+  type: 'proposal_state';
+  refId: string;
+  proposal: IProposal;
+};
+
+export type ISubscriptionStats = {
+  type: 'stats';
+  stats: IGlobalStats;
+};
+
+export type ISubscription = ISubscriptionBase & (
+  ISubscriptionNewProtocol |
+  ISubscriptionNewProposal |
+  ISubscriptionVoterVotes |
+  ISubscriptionProposalVotes |
+  ISubscriptionProposalState |
+  ISubscriptionStats
+);

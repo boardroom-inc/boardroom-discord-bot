@@ -2,6 +2,7 @@ import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
 import BoardRoomApiService from './boardRoomApiService';
 import localCommands from './commands';
+import { ISubscription } from './models';
 
 dotenv.config();
 
@@ -16,10 +17,17 @@ const bot = new Discord.Client({
 
 const boardroomApi = new BoardRoomApiService();
 
+const subscriptions: ISubscription[] = [];
+
 const commands = localCommands.map(localCommand => {
   const { name, description } = localCommand;
   const options: Discord.ApplicationCommandOptionData[] = (localCommand.options || []).map(localOption => {
-    return { name: localOption.name, description: localOption.description, type: 'STRING', required: true };
+    return {
+      name: localOption.name,
+      description: localOption.description,
+      type: localOption.type || 'STRING',
+      required: typeof localOption.required === 'boolean' ? localOption.required : true,
+    };
   });
 
   const command: Discord.ApplicationCommandData = { name, description, options };
@@ -42,7 +50,7 @@ bot.on('interactionCreate', async (interaction) => {
   const command = localCommands.find(command => command.name === interaction.commandName);
   if (command) {
     console.log(`Executing command: ${interaction.commandName}`);
-    await command.handler({ interaction, boardroomApi });
+    await command.handler({ interaction, boardroomApi, subscriptions });
     console.log('Ran successfully.');
   } else {
     console.log(`Could not find command: ${interaction.commandName}`);
