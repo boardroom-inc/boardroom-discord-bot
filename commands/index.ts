@@ -168,7 +168,7 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
     options: [
       {
         name: 'address',
-        description: 'Address of the voer'
+        description: 'Address of the voter'
       }
     ],
     handler: async ({ interaction, boardroomApi }) => {
