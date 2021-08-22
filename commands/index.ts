@@ -245,7 +245,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     options: [
       {
         name: 'frequency',
-        description: 'Frequency to check in hours (could be decimals too)',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -253,7 +253,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
         const channel = interaction.channel!;
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_protocol';
 
         const existing = subscriptions.find(subscription => subscription.channel.id === channel.id && subscription.type === type);
@@ -288,7 +288,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       },
       {
         name: 'frequency',
-        description: 'Frequency to check',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -297,7 +297,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       try {
         const channel = interaction.channel!;
         const cname = interaction.options.getString('cname', true);
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_proposal';
 
         const existing = subscriptions.find(subscription => {
@@ -333,7 +333,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       },
       {
         name: 'frequency',
-        description: 'Frequency to check',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -342,7 +342,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       try {
         const channel = interaction.channel!;
         const refId = interaction.options.getString('refid', true);
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'proposal_state';
 
         const existing = subscriptions.find(subscription => {
@@ -379,7 +379,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       },
       {
         name: 'frequency',
-        description: 'Frequency to check',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -388,7 +388,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       try {
         const channel = interaction.channel!;
         const refId = interaction.options.getString('refid', true);
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_proposal_vote';
 
         const existing = subscriptions.find(subscription => {
@@ -425,7 +425,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       },
       {
         name: 'frequency',
-        description: 'Frequency to check',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -434,7 +434,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
       try {
         const channel = interaction.channel!;
         const address = interaction.options.getString('address', true);
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_voter_vote';
 
         const existing = subscriptions.find(subscription => {
@@ -466,7 +466,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     options: [
       {
         name: 'frequency',
-        description: 'Frequency to check',
+        description: 'Frequency to check in hours (could be decimals too). Default is 15 minutes.',
         type: 'NUMBER',
         required: false,
       }
@@ -474,7 +474,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
         const channel = interaction.channel!;
-        const frequency = interaction.options.getNumber('frequency', false) || 4 / 60;
+        const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'stats';
 
         const existing = subscriptions.find(subscription => subscription.channel.id === channel.id && subscription.type === type);
