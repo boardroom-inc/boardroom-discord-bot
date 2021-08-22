@@ -188,19 +188,17 @@ export type ISubscriptionNewProtocol = {
 export type ISubscriptionNewProposal = {
   type: 'new_proposal';
   cname: string;
-  proposals: IProposal[];
 };
 
 export type ISubscriptionProposalVotes = {
   type: 'new_proposal_vote';
   refId: string;
-  proposalVotes: IProposalVote[];
+  proposal: IProposal;
 };
 
 export type ISubscriptionVoterVotes = {
   type: 'new_voter_vote';
   address: string;
-  voterVotes: IVoterVote[];
 };
 
 export type ISubscriptionProposalState = {

@@ -81,13 +81,21 @@ const commands: ICommand[] = [
       const refid = interaction.options.getString('refid', true);
       try {
         await interaction.deferReply();
+        const details = await boardroomApi.getProposalDetails(refid);
         const request = await boardroomApi.listProposalVotes(refid);
-        const list = request.data.map((proposalVote, index) => {
+        const choices = details.data.choices;
+        let list = request.data.map(proposalVote => {
           return `
-${index + 1 } - \`${proposalVote.address}\` voted ${proposalVote.choice} with \`${proposalVote.power}\` of power at ${new Date(proposalVote.timestamp * 1000).toUTCString()}
+${new Date(proposalVote.timestamp * 1000).toUTCString()} - \`${proposalVote.address}\` voted \`${choices[proposalVote.choice]}\`
         `.trim();
-        }).join("\n");
-        const reply = list.length === 0 ? 'This proposal has no votes.' : `Votes for proposal: \n${list}`;
+        });
+        if (list.length > 15) {
+          const newItem = `+${list.length - 15} votes (https://app.boardroom.info/index/proposal/${refid})`;
+          list = list.slice(0, 15);
+          list.push(newItem);
+        }
+
+        const reply = list.length === 0 ? 'This proposal has no votes.' : `Votes for \`${details.data.title}\`: \n${list.join("\n")}`;
         await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
@@ -303,10 +311,9 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         await interaction.deferReply();
 
         const lastCheck = new Date();
-        const request = await boardroomApi.listProtocolProposals(cname);
-        const proposals = request.data;
+        await boardroomApi.getProtocol(cname); // just a confirmation that it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, cname, proposals };
+        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, cname };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to all new proposals at ${cname}!`);
@@ -395,13 +402,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         await interaction.deferReply();
 
         const lastCheck = new Date();
-        const request = await boardroomApi.listProposalVotes(refId);
-        const proposalVotes = request.data;
+        const request = await boardroomApi.getProposalDetails(refId);
+        const proposal = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, refId, proposalVotes };
+        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, refId, proposal };
         subscriptions.push(newSubscription);
 
-        await interaction.editReply(`Subscribed to state changes to this proposal!`);
+        await interaction.editReply(`Subscribed to new votes for this proposal!`);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
@@ -414,7 +421,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     options: [
       {
         name: 'address',
-        description: 'Adress of the voter'
+        description: 'Address of the voter'
       },
       {
         name: 'frequency',
@@ -441,13 +448,12 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         await interaction.deferReply();
 
         const lastCheck = new Date();
-        const request = await boardroomApi.listVoterVotes(address);
-        const voterVotes = request.data;
+        await boardroomApi.getVoter(address); // just make sure it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, address, voterVotes };
+        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, address };
         subscriptions.push(newSubscription);
 
-        await interaction.editReply(`Subscribed to state changes to this proposal!`);
+        await interaction.editReply(`Subscribed to new votes by ${address}!`);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }

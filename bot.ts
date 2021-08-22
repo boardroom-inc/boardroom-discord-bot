@@ -1,8 +1,9 @@
 import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
+import { ISubscription } from './models';
 import BoardRoomApiService from './boardRoomApiService';
 import localCommands from './commands';
-import { ISubscription } from './models';
+import checkSubscriptions from './checkSubscriptions';
 
 dotenv.config();
 
@@ -58,3 +59,4 @@ bot.on('interactionCreate', async (interaction) => {
 });
 
 bot.login(process.env.BOT_TOKEN);
+setInterval(checkSubscriptions, 30000, subscriptions, boardroomApi);

@@ -149,17 +149,15 @@ export declare type ISubscriptionNewProtocol = {
 export declare type ISubscriptionNewProposal = {
     type: 'new_proposal';
     cname: string;
-    proposals: IProposal[];
 };
 export declare type ISubscriptionProposalVotes = {
     type: 'new_proposal_vote';
     refId: string;
-    proposalVotes: IProposalVote[];
+    proposal: IProposal;
 };
 export declare type ISubscriptionVoterVotes = {
     type: 'new_voter_vote';
     address: string;
-    voterVotes: IVoterVote[];
 };
 export declare type ISubscriptionProposalState = {
     type: 'proposal_state';
