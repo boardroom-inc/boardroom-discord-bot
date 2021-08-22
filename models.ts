@@ -1,8 +1,7 @@
-// SCHEMA
-
 import { ApplicationCommandOptionType, CommandInteraction, TextBasedChannels } from "discord.js";
-import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
 import BoardRoomApiService from "./boardRoomApiService";
+
+// SCHEMA
 
 export interface IProtocolIcon {
   adapter: string;
