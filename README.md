@@ -4,7 +4,16 @@ A bot to interact with Boardroom's API and subscribe to new events.
 
 There are two sets of commands: Commands to get general information and commands for subscriptions.
 
-Subscriptions are run through every 30 seconds.
+Subscriptions are run through every 30 seconds, but the checks are only done based on the `frequency` argument. By default this is every 15 minutes.
+
+## Set up
+
+The `.env.example` can be used to create an `.env` file which the token which is created on the [Discord Developer Portal](https://discord.com/developers/applications).
+
+Once there's an `.env` file, run the commands:
+- `npm install`
+- `npm run tsc`
+- `node bot.js`
 
 ## Commands
 
@@ -60,47 +69,49 @@ Prints Boardroom's global statistics.
 Be notified any time a new protocol is added.
 
 Options:
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./subscribe_to_protocol_proposals
 Be notified any time a new proposal is added.
 
 Options:
 * `cname` (required) - Code name for the protocol must be [a-z0-9] (e.g "uniswap")
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./subscribe_to_proposal_state
 Be notified any time the state of a proposal changes.
 
 Options:
 * `refid` (required) - Unique code representing proposal (ends with =)
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./subscribe_to_proposal_votes
 Be notified any time a proposal has a new vote.
 
 Options:
 * `refid` (required) - Unique code representing proposal (ends with =)
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./subscribe_to_voter_votes
 Be notified any time an address votes.
 
 Options:
 * `address` (required) - Address of the voter
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./subscribe_to_stats
 Display global statistics from time to time.
 
 Options:
-* `frequency` - How often to check (in hours)
+* `frequency` - How often to check (in hours). Default is 15 minutes (0.25)
 
 #### ./show_all_subscriptions
-Lists all active subscriptions.
+Lists all active subscriptions, including their number which allows to delete them.
 
 #### ./delete_subscription
 Delete a subscription
 
+* `number` - Subscription number which you can get from `/show_all_subscriptions`. This corresponds to an index.
+
 #### ./delete_all_subscriptions
-Delete all subscriptions
+Delete all subscriptions.
