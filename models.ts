@@ -176,7 +176,7 @@ export interface ListVoterVotesOptions extends PaginationOtions {
 export type ISubscriptionBase = {
   frequency: number;
   lastCheck: Date;
-  channel: TextBasedChannels;
+  channelId: string;
 };
 
 export type ISubscriptionNewProtocol = {

@@ -252,11 +252,11 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_protocol';
 
-        const existing = subscriptions.find(subscription => subscription.channel.id === channel.id && subscription.type === type);
+        const existing = subscriptions.find(subscription => subscription.channelId === channelId && subscription.type === type);
         if (existing) {
           interaction.reply('You are already subscribed to new protocols.');
           return;
@@ -268,7 +268,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.listProtocols();
         const protocols = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, protocols };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, protocols };
         subscriptions.push(newSubscription);
 
         await interaction.editReply('This channel will be notified every time there\'s a new protocol.');
@@ -295,13 +295,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const cname = interaction.options.getString('cname', true);
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_proposal';
 
         const existing = subscriptions.find(subscription => {
-          return subscription.channel.id === channel.id && subscription.type === type && subscription.cname === cname
+          return subscription.channelId === channelId && subscription.type === type && subscription.cname === cname
         });
         if (existing) {
           interaction.reply(`You are already subscribed to new proposals at ${cname}`);
@@ -313,7 +313,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const lastCheck = new Date();
         await boardroomApi.getProtocol(cname); // just a confirmation that it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, cname };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, cname };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to all new proposals at ${cname}!`);
@@ -340,13 +340,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const refId = interaction.options.getString('refid', true);
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'proposal_state';
 
         const existing = subscriptions.find(subscription => {
-          return subscription.channel.id === channel.id && subscription.type === type && subscription.refId === refId
+          return subscription.channelId === channelId && subscription.type === type && subscription.refId === refId
         });
         if (existing) {
           interaction.reply(`You are already subscribed to state changes to \`${refId}\``);
@@ -359,7 +359,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getProposalDetails(refId);
         const proposal = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, refId, proposal };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, refId, proposal };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to state changes to \`${proposal.title}\`!`);
@@ -386,13 +386,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const refId = interaction.options.getString('refid', true);
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_proposal_vote';
 
         const existing = subscriptions.find(subscription => {
-          return subscription.channel.id === channel.id && subscription.type === type && subscription.refId === refId
+          return subscription.channelId === channelId && subscription.type === type && subscription.refId === refId
         });
         if (existing) {
           interaction.reply(`You are already subscribed to state changes to \`${refId}\``);
@@ -405,7 +405,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getProposalDetails(refId);
         const proposal = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, refId, proposal };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, refId, proposal };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to new votes for this proposal!`);
@@ -432,13 +432,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const address = interaction.options.getString('address', true);
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'new_voter_vote';
 
         const existing = subscriptions.find(subscription => {
-          return subscription.channel.id === channel.id && subscription.type === type && subscription.address === address
+          return subscription.channelId === channelId && subscription.type === type && subscription.address === address
         });
         if (existing) {
           interaction.reply(`You are already subscribed to state changes to \`${address}\``);
@@ -450,7 +450,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const lastCheck = new Date();
         await boardroomApi.getVoter(address); // just make sure it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, address };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, address };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to new votes by ${address}!`);
@@ -473,11 +473,11 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     ],
     handler: async ({ interaction, boardroomApi, subscriptions }) => {
       try {
-        const channel = interaction.channel!;
+        const channelId = interaction.channel!.id;
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
         const type = 'stats';
 
-        const existing = subscriptions.find(subscription => subscription.channel.id === channel.id && subscription.type === type);
+        const existing = subscriptions.find(subscription => subscription.channelId === channelId && subscription.type === type);
         if (existing) {
           interaction.reply(`You are already subscribed to stats on this channel`);
           return;
@@ -489,7 +489,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getStats();
         const stats = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channel, frequency, stats };
+        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, stats };
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to all statistics!`);
@@ -505,7 +505,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     handler: async ({ interaction, subscriptions }) => {
       try {
         const list = subscriptions.map((subscription, index) => {
-          let result = `#${index + 1} - on channel ${subscription.channel.id} ~`;
+          let result = `#${index + 1} - on channel ${subscription.channelId} ~`;
           switch (subscription.type) {
             case 'new_proposal':
               result += `Every new proposal for ${subscription.cname}.`

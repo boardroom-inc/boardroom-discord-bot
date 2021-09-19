@@ -1,11 +1,23 @@
+import * as Discord from 'discord.js';
 import BoardRoomApiService from "./boardRoomApiService";
 import { ISubscription } from "./models";
 
-const checkSubscriptions = async (subscriptions: ISubscription[], boardroomApi: BoardRoomApiService) => {
+interface Params {
+  client: Discord.Client;
+  subscriptions: ISubscription[];
+  boardroomApi: BoardRoomApiService;
+}
+
+const checkSubscriptions = async ({ subscriptions, boardroomApi, client }: Params) => {
   const now = new Date();
 
   for (let i = 0; i < subscriptions.length; i++) {
     const subscription = subscriptions[i];
+    const channel = client.channels.cache.find(channel => channel.id === subscription.channelId);
+    if (! channel || ! channel.isText()) {
+      return;
+    }
+
     const diffInHours = (now.valueOf() - subscription.lastCheck.valueOf()) / 1000 / 3600;
     if (diffInHours < subscription.frequency) {
       return;
@@ -24,7 +36,7 @@ const checkSubscriptions = async (subscriptions: ISubscription[], boardroomApi: 
 New protocols for Boardroom!
 {${difference.map(protocol => `- ${protocol.name} (${protocol.cname})`).join("\n")}}
           `.trim();
-          subscription.channel.send(message);
+          channel.send(message);
         }
 
         subscription.protocols = currentProtocols.data;
@@ -42,7 +54,7 @@ New protocols for Boardroom!
 New proposals for ${subscription.cname}}!
 {${difference.map(proposal => `- \`${proposal.title}\` by (${proposal.proposer})`).join("\n")}}
           `.trim();
-          subscription.channel.send(message);
+          channel.send(message);
         }
         break;
       }
@@ -58,7 +70,7 @@ New proposals for ${subscription.cname}}!
 New votes in ${subscription.proposal.title}}!
 {${difference.map(proposalVote => `- \`${proposalVote.address}\` voted ${subscription.proposal.choices[proposalVote.choice]}`).join("\n")}}
           `.trim();
-          subscription.channel.send(message);
+          channel.send(message);
         }
         break;
       }
@@ -74,7 +86,7 @@ New votes in ${subscription.proposal.title}}!
 New votes by ${subscription.address}}!
 {${difference.map(voterVote => `- \`${subscription.address}\` voted \`${voterVote.proposalInfo.choices[voterVote.choice]} \` in ${voterVote.proposalInfo.title} (${voterVote.proposalInfo.refId})`).join("\n")}}
           `.trim();
-          subscription.channel.send(message);
+          channel.send(message);
         }
         break;
       }
@@ -87,7 +99,7 @@ New votes by ${subscription.address}}!
           const message = `
 Proposal ${newProposal.data.title} went from \`${oldProposal.currentState}\` to \`${newProposal.data.currentState}\`!
           `.trim();
-          subscription.channel.send(message);
+          channel.send(message);
         }
 
         subscription.proposal = newProposal.data;
@@ -152,7 +164,7 @@ Total Unique Voters: ${totalUniqueVoters.toString().replace(/\B(?=(\d{3})+(?!\d)
 Total Votes Cast: ${totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ${totalVotesCastDifferenceText}
         `.trim();
 
-        subscription.channel.send(message);
+        channel.send(message);
         subscription.stats = newStats;
         break;
       }
