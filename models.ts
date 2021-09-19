@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, CommandInteraction, TextBasedChannels } from "discord.js";
-import BoardRoomApiService from "./boardRoomApiService";
+import BoardRoomApiService from "./services/boardRoomApiService";
+import SubscriptionService from "./services/subscriptionService";
 
 // SCHEMA
 
@@ -112,6 +113,7 @@ export interface IGlobalStats {
 export type ICommandHandlerArguments = {
   interaction: CommandInteraction;
   boardroomApi: BoardRoomApiService;
+  subscriptionService: SubscriptionService;
   subscriptions: ISubscription[];
 }
 
@@ -174,6 +176,7 @@ export interface ListVoterVotesOptions extends PaginationOtions {
 // Subscriptions
 
 export type ISubscriptionBase = {
+  id: string;
   frequency: number;
   lastCheck: Date;
   channelId: string;

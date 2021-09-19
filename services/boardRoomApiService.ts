@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
-import { IGlobalStats, IProposal, IProposalVote, IProtocol, IVoter, IVoterVote, ListProposalsOptions, ListProposalsVotesOptions, ListProtocolOptions, ListProtocolProposalsOptions, ListSuccessResponse, ListVoterVotesOptions, PaginationOtions, SuccessResponse } from "./models";
-import { buildQueryString } from './utils';
+import { IGlobalStats, IProposal, IProposalVote, IProtocol, IVoter, IVoterVote, ListProposalsOptions, ListProposalsVotesOptions, ListProtocolOptions, ListProtocolProposalsOptions, ListSuccessResponse, ListVoterVotesOptions, PaginationOtions, SuccessResponse } from "../models";
+import { buildQueryString } from '../utils';
 
 const API_VERSION = 'v1';
 const API_URL = `https://api.boardroom.info/${API_VERSION}/`;

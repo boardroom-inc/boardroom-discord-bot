@@ -1,14 +1,16 @@
 import * as Discord from 'discord.js';
-import BoardRoomApiService from "./boardRoomApiService";
+import BoardRoomApiService from "./services/boardRoomApiService";
 import { ISubscription } from "./models";
+import SubscriptionService from './services/subscriptionService';
 
 interface Params {
   client: Discord.Client;
   subscriptions: ISubscription[];
   boardroomApi: BoardRoomApiService;
+  subscriptionService: SubscriptionService;
 }
 
-const checkSubscriptions = async ({ subscriptions, boardroomApi, client }: Params) => {
+const checkSubscriptions = async ({ subscriptions, boardroomApi, client, subscriptionService }: Params) => {
   const now = new Date();
 
   for (let i = 0; i < subscriptions.length; i++) {
@@ -169,6 +171,8 @@ Total Votes Cast: ${totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "
         break;
       }
     }
+
+    await subscriptionService.update(subscription);
   }
 };
 

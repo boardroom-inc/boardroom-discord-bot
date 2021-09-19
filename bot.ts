@@ -1,10 +1,13 @@
 import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
+import * as AWS from 'aws-sdk';
 import { ISubscription } from './models';
-import BoardRoomApiService from './boardRoomApiService';
+import BoardRoomApiService from './services/boardRoomApiService';
 import localCommands from './commands';
 import checkSubscriptions from './checkSubscriptions';
+import SubscriptionService from './services/subscriptionService';
 
+AWS.config.update({ region:'us-east-1' });
 dotenv.config();
 
 console.log('Bot starting up...');
@@ -17,8 +20,9 @@ const bot = new Discord.Client({
 });
 
 const boardroomApi = new BoardRoomApiService();
+const subscriptionService = new SubscriptionService();
 
-const subscriptions: ISubscription[] = [];
+let subscriptions: ISubscription[] = [];
 
 const commands = localCommands.map(localCommand => {
   const { name, description } = localCommand;
@@ -51,12 +55,17 @@ bot.on('interactionCreate', async (interaction) => {
   const command = localCommands.find(command => command.name === interaction.commandName);
   if (command) {
     console.log(`Executing command: ${interaction.commandName}`);
-    await command.handler({ interaction, boardroomApi, subscriptions });
+    await command.handler({ interaction, boardroomApi, subscriptionService, subscriptions });
     console.log('Ran successfully.');
   } else {
     console.log(`Could not find command: ${interaction.commandName}`);
   }
 });
 
-bot.login(process.env.BOT_TOKEN);
-setInterval(checkSubscriptions, 30000, subscriptions, boardroomApi);
+async function main() {
+  subscriptions = await subscriptionService.list();
+  bot.login(process.env.BOT_TOKEN);
+  setInterval(checkSubscriptions, 30000, { client: bot, subscriptions, boardroomApi, subscriptionService });  
+}
+
+main();

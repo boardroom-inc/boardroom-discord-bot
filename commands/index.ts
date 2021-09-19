@@ -1,4 +1,4 @@
-import { ICommand, ISubscription } from '../models';
+import { ICommand } from '../models';
 
 const commands: ICommand[] = [
   {
@@ -250,7 +250,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
@@ -268,7 +268,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.listProtocols();
         const protocols = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, protocols };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, protocols });
         subscriptions.push(newSubscription);
 
         await interaction.editReply('This channel will be notified every time there\'s a new protocol.');
@@ -293,7 +293,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const cname = interaction.options.getString('cname', true);
@@ -313,7 +313,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const lastCheck = new Date();
         await boardroomApi.getProtocol(cname); // just a confirmation that it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, cname };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, cname });
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to all new proposals at ${cname}!`);
@@ -338,7 +338,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const refId = interaction.options.getString('refid', true);
@@ -359,7 +359,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getProposalDetails(refId);
         const proposal = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, refId, proposal };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, refId, proposal });
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to state changes to \`${proposal.title}\`!`);
@@ -384,7 +384,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const refId = interaction.options.getString('refid', true);
@@ -405,7 +405,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getProposalDetails(refId);
         const proposal = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, refId, proposal };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, refId, proposal });
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to new votes for this proposal!`);
@@ -430,7 +430,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const address = interaction.options.getString('address', true);
@@ -450,7 +450,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const lastCheck = new Date();
         await boardroomApi.getVoter(address); // just make sure it exists.
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, address };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, address });
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to new votes by ${address}!`);
@@ -471,7 +471,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         required: false,
       }
     ],
-    handler: async ({ interaction, boardroomApi, subscriptions }) => {
+    handler: async ({ interaction, boardroomApi, subscriptionService, subscriptions }) => {
       try {
         const channelId = interaction.channel!.id;
         const frequency = interaction.options.getNumber('frequency', false) || 15 / 60;
@@ -489,7 +489,7 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
         const request = await boardroomApi.getStats();
         const stats = request.data;
 
-        const newSubscription: ISubscription = { type, lastCheck, channelId, frequency, stats };
+        const newSubscription = await subscriptionService.create({ type, lastCheck, channelId, frequency, stats });
         subscriptions.push(newSubscription);
 
         await interaction.editReply(`Subscribed to all statistics!`);
@@ -504,8 +504,8 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     description: 'Lists all active subscriptions.',
     handler: async ({ interaction, subscriptions }) => {
       try {
-        const list = subscriptions.map((subscription, index) => {
-          let result = `#${index + 1} - on channel ${subscription.channelId} ~`;
+        const list = subscriptions.map((subscription) => {
+          let result = `\`${subscription.id}\` on channel ${subscription.channelId} ~`;
           switch (subscription.type) {
             case 'new_proposal':
               result += `Every new proposal for ${subscription.cname}.`
@@ -549,15 +549,22 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
     description: 'Delete a subscription',
     options: [
       {
-        name: 'number',
-        description: 'Number of the subscription (you can get it with /show_all_subscriptions'
+        name: 'id',
+        description: 'ID of the subscription to delete'
       },
     ],
-    handler: async ({ interaction, subscriptions }) => {
+    handler: async ({ interaction, subscriptionService, subscriptions }) => {
       try {
-        const index = interaction.options.getNumber('number', true) - 1;
-        subscriptions.splice(index, 1);
-        await interaction.reply(`Removed subscription #${index}. Keep in mind the order other subscriptions changed.`);
+        const id = interaction.options.getString('id', true);
+
+        await subscriptionService.delete(id); // not deferred since it's too fast? it literally fails
+
+        const index = subscriptions.findIndex(subscription => subscription.id);
+        if (index > -1) {
+          subscriptions.splice(index, 1);
+        }
+
+        await interaction.reply(`Removed subscription successfully.`);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
@@ -567,9 +574,13 @@ Total Votes Cast: ${stats.totalVotesCast.toString().replace(/\B(?=(\d{3})+(?!\d)
   {
     name: 'delete_all_subscriptions',
     description: 'Delete all subscriptions',
-    handler: async ({ interaction, subscriptions }) => {
-      subscriptions.length = 0;
-      interaction.reply('Deleted all subscriptions.');
+    handler: async ({ interaction, subscriptionService, subscriptions }) => {
+      await interaction.deferReply();
+
+      const promises = subscriptions.map(subscription => subscriptionService.delete(subscription.id));
+      await Promise.all(promises);
+
+      await interaction.reply('Deleted all subscriptions.');
     },
   },
 ];
