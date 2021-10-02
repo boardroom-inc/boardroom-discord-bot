@@ -8,6 +8,10 @@ Subscriptions are run through every 30 seconds, but the checks are only done bas
 
 ## Set up
 
+This bot uses AWS DynamoDB to store the subscriptions, so the `aws-cli` must be set up in the machine running it, with a table called `subscriptions` and a primary key called `id`. You can see a CDK example [here](https://github.com/Zerquix18/boardroom-bot-cdk/blob/master/lib/boardroom-stack-stack.ts#L28).
+
+The name of the table can be changed from the Dynamo service on this project.
+
 The `.env.example` can be used to create an `.env` file which the token which is created on the [Discord Developer Portal](https://discord.com/developers/applications).
 
 Once there's an `.env` file, run the commands:
@@ -111,7 +115,7 @@ Lists all active subscriptions, including their number which allows to delete th
 #### ./delete_subscription
 Delete a subscription
 
-* `number` - Subscription number which you can get from `/show_all_subscriptions`. This corresponds to an index.
+* `id` - Subscription unique identifir (uuid) which you can get from `/show_all_subscriptions`.
 
 #### ./delete_all_subscriptions
 Delete all subscriptions.
