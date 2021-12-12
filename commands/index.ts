@@ -184,7 +184,7 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
 
         if (list.length === 0) {
           await interaction.editReply(`${address} has never voted.`);
-        } else if (list.length > 50) {
+        } else if (list.length < 50) {
           await interaction.editReply(`Votes by ${address}:\n${list}`);
         } else {
           await interaction.editReply(`Votes by ${address}:`);
