@@ -1,3 +1,4 @@
+import { chunk } from 'lodash';
 import { ICommand } from '../models';
 
 const commands: ICommand[] = [
@@ -178,10 +179,22 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
         const request = await boardroomApi.listVoterVotes(address);
         const voterVotes = request.data;
         const list = voterVotes.map(voterVote => {
-          return `- Voted \`${voterVote.choice}\` in \`${voterVote.proposalInfo.title}\` (\`${voterVote.proposalRefId}\`) on ${new Date(voterVote.timestamp * 1000).toUTCString()}`
+          return `- Voted \`${voterVote.choice}\` in \`${voterVote.proposalInfo.title}\` (\`${voterVote.proposalRefId}\`) on ${new Date(voterVote.timestamp * 1000).toUTCString()}`;
         });
-        const reply = list.length === 0 ? `${address} has never voted.` : `Votes by ${address}:\n${list}`;
-        await interaction.editReply(reply);
+
+        if (list.length === 0) {
+          await interaction.editReply(`${address} has never voted.`);
+        } else if (list.length > 50) {
+          await interaction.editReply(`Votes by ${address}:\n${list}`);
+        } else {
+          await interaction.editReply(`Votes by ${address}:`);
+          const chunks = chunk(list, 50);
+          for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            await interaction.channel!.send(chunk.join(''));
+          }
+        }
+
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
