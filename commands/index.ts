@@ -104,8 +104,6 @@ ${new Date(proposalVote.timestamp * 1000).toUTCString()} - \`${proposalVote.addr
           }
         }
 
-        const reply = list.length === 0 ? 'This proposal has no votes.' : `Votes for \`${details.data.title}\`: \n${list.join("\n")}`;
-        await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
