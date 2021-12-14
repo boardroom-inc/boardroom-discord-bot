@@ -12,7 +12,7 @@ const commands: ICommand[] = [
         const list = request.data
                                  .map((protocol, index) => `[${index + 1}] \`${protocol.cname}\` - ${protocol.name}`)
                                  .join("\n");
-        await interaction.reply(`Boardroom's supported protocols: \n:`);
+        await interaction.reply(`Boardroom's supported protocols: \n`);
         const chunks = chunk(list, 20);
         for (let i = 0; i < chunks.length; i++) {
           const chunk = chunks[i];
