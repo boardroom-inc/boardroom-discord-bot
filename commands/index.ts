@@ -12,8 +12,12 @@ const commands: ICommand[] = [
         const list = request.data
                                  .map((protocol, index) => `[${index + 1}] \`${protocol.cname}\` - ${protocol.name}`)
                                  .join("\n");
-        const reply = `Boardroom's supported protocols: \n${list}`;
-        await interaction.editReply(reply);
+        await interaction.reply(`Boardroom's supported protocols: \n:`);
+        const chunks = chunk(list, 20);
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i];
+          await interaction.channel!.send(chunk.join("\n"));
+        }
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
