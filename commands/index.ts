@@ -191,7 +191,7 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
           const chunks = chunk(list, 10);
           for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
-            await interaction.channel!.send(chunk.join(''));
+            await interaction.channel!.send(chunk.join("\n"));
           }
         }
 
