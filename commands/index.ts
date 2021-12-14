@@ -184,11 +184,11 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
 
         if (list.length === 0) {
           await interaction.editReply(`${address} has never voted.`);
-        } else if (list.length < 50) {
+        } else if (list.length < 10) {
           await interaction.editReply(`Votes by ${address}:\n${list}`);
         } else {
           await interaction.editReply(`Votes by ${address}:`);
-          const chunks = chunk(list, 50);
+          const chunks = chunk(list, 10);
           for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             await interaction.channel!.send(chunk.join(''));
