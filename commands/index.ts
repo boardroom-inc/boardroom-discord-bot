@@ -93,11 +93,11 @@ ${new Date(proposalVote.timestamp * 1000).toUTCString()} - \`${proposalVote.addr
 
         if (list.length === 0) {
           await interaction.editReply(`${details.data.title} doesn't have any votes.`);
-        } else if (list.length < 10) {
+        } else if (list.length < 6) {
           await interaction.editReply(`Votes for \`${details.data.title}\`: \n${list.join("\n")}`);
         } else {
           await interaction.editReply(`Votes for \`${details.data.title}\`: \n`);
-          const chunks = chunk(list, 10);
+          const chunks = chunk(list, 6);
           for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             await interaction.channel!.send(chunk.join("\n"));
