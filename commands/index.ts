@@ -90,10 +90,18 @@ const commands: ICommand[] = [
 ${new Date(proposalVote.timestamp * 1000).toUTCString()} - \`${proposalVote.address}\` voted \`${choices[proposalVote.choice]}\`
         `.trim();
         });
-        if (list.length > 15) {
-          const newItem = `+${list.length - 15} votes (https://app.boardroom.info/index/proposal/${refid})`;
-          list = list.slice(0, 15);
-          list.push(newItem);
+
+        if (list.length === 0) {
+          await interaction.editReply(`${details.data.title} doesn't have any votes.`);
+        } else if (list.length < 10) {
+          await interaction.editReply(`Votes for \`${details.data.title}\`: \n${list.join("\n")}`);
+        } else {
+          await interaction.editReply(`Votes for \`${details.data.title}\`: \n`);
+          const chunks = chunk(list, 10);
+          for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            await interaction.channel!.send(chunk.join("\n"));
+          }
         }
 
         const reply = list.length === 0 ? 'This proposal has no votes.' : `Votes for \`${details.data.title}\`: \n${list.join("\n")}`;
