@@ -12,9 +12,9 @@ const commands: ICommand[] = [
         let reply = `Boardroom's supported protocols: \n`;
         if (list.length > 20) {
           reply += list.slice(0, 20).join("\n");
-          reply += `\n Plus ${list.length - 20} more https://app.boardroom.info/`;
+          reply += `\n Plus ${list.length - 20} more: https://app.boardroom.info/`;
         } else {
-          reply = list.join("\n");
+          reply += list.join("\n");
         }
         await interaction.editReply(reply);
       } catch (e) {
@@ -56,7 +56,7 @@ const commands: ICommand[] = [
           reply += list.slice(0, LIMIT).join("\n");
           reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${cname}/proposals`;
         } else {
-          reply = list.join("\n");
+          reply += list.join("\n");
         }
         await interaction.editReply(reply);
       } catch (e) {
@@ -95,7 +95,7 @@ const commands: ICommand[] = [
           reply += list.slice(0, LIMIT).join("\n");
           reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${cname}/voters`;
         } else {
-          reply = list.join("\n");
+          reply += list.join("\n");
         }
         await interaction.editReply(reply);
       } catch (e) {
@@ -142,7 +142,7 @@ const commands: ICommand[] = [
           reply += list.slice(0, LIMIT).join("\n");
           reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${details.data.protocol}/proposals/${refid}`;
         } else {
-          reply = list.join("\n");
+          reply += list.join("\n");
         }
         await interaction.editReply(reply);
       } catch (e) {
@@ -246,7 +246,7 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
           reply += list.slice(0, LIMIT).join("\n");
           reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/voter/${address}`;
         } else {
-          reply = list.join("\n");
+          reply += list.join("\n");
         }
 
         await interaction.editReply(reply);
