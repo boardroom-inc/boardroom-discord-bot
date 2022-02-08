@@ -1,4 +1,3 @@
-import chunk from 'lodash/chunk';
 import { ICommand } from '../models';
 
 const commands: ICommand[] = [
@@ -9,15 +8,15 @@ const commands: ICommand[] = [
       try {
         await interaction.deferReply();
         const request = await boardroomApi.listProtocols();
-        const list = request.data
-                                 .map((protocol, index) => `[${index + 1}] \`${protocol.cname}\` - ${protocol.name}`)
-                                 .join("\n");
-        await interaction.editReply(`Boardroom's supported protocols: \n`);
-        const chunks = chunk(list, 20);
-        for (let i = 0; i < chunks.length; i++) {
-          const chunk = chunks[i];
-          await interaction.channel!.send(chunk.join("\n"));
+        const list = request.data.map((protocol, index) => `[${index + 1}] \`${protocol.cname}\` - ${protocol.name}`)
+        let reply = `Boardroom's supported protocols: \n`;
+        if (list.length > 20) {
+          reply += list.slice(0, 20).join("\n");
+          reply += `\n Plus ${list.length - 20} more https://app.boardroom.info/`;
+        } else {
+          reply = list.join("\n");
         }
+        await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
@@ -35,13 +34,30 @@ const commands: ICommand[] = [
     ],
     handler: async ({ interaction, boardroomApi }) => {
       const cname = interaction.options.getString('cname', true);
+      const LIMIT = 15;
+
       try {
         await interaction.deferReply();
         const request = await boardroomApi.listProtocolProposals(cname);
+        request.data.sort((a, b) => b.blockNumber - a.blockNumber);
+
         const list = request.data.map((proposal, index) => {
           return `${index + 1 } - [\`${proposal.refId}\`]: ${proposal.title} (${proposal.currentState})`
-        }).join("\n");
-        const reply = `${cname}'s proposals: \n${list}`;
+        });
+
+
+        if (list.length === 0) {
+          await interaction.editReply(`There are no proposals for ${cname}.`);
+          return;
+        }
+
+        let reply = `${cname}'s proposals: \n`;
+        if (list.length > LIMIT) {
+          reply += list.slice(0, LIMIT).join("\n");
+          reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${cname}/proposals`;
+        } else {
+          reply = list.join("\n");
+        }
         await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
@@ -60,12 +76,27 @@ const commands: ICommand[] = [
     ],
     handler: async ({ interaction, boardroomApi }) => {
       const cname = interaction.options.getString('cname', true);
+      const LIMIT = 20;
+
       try {
         await interaction.deferReply();
         const request = await boardroomApi.listProtocolVoters(cname);
-        const reply = request.data.map((voter, index) => {
-          return `${index + 1} - \`${voter.address}\``;
-        }).join("\n");
+        request.data.sort((a, b) => a.lastVoteCast - b.lastVoteCast);
+
+        const list = request.data.map((voter, index) => `${index + 1} - \`${voter.address}\``);
+
+        if (list.length === 0) {
+          await interaction.editReply(`There are no voters for ${cname}.`);
+          return;
+        }
+
+        let reply = `${cname}'s voters: \n`;
+        if (list.length > LIMIT) {
+          reply += list.slice(0, LIMIT).join("\n");
+          reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${cname}/voters`;
+        } else {
+          reply = list.join("\n");
+        }
         await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
@@ -75,7 +106,7 @@ const commands: ICommand[] = [
 
   {
     name: 'proposal_votes',
-    description: 'Lists all voters in a protocol',
+    description: 'Lists all votes for a proposal',
     options: [
       {
         name: 'refid',
@@ -84,30 +115,36 @@ const commands: ICommand[] = [
     ],
     handler: async ({ interaction, boardroomApi }) => {
       const refid = interaction.options.getString('refid', true);
+      const LIMIT = 6;
       try {
         await interaction.deferReply();
         const details = await boardroomApi.getProposalDetails(refid);
         const request = await boardroomApi.listProposalVotes(refid);
         const choices = details.data.choices;
+        
+        request.data.sort((a, b) => b.timestamp - a.timestamp);
+
         let list = request.data.map(proposalVote => {
-          return `
-${new Date(proposalVote.timestamp * 1000).toUTCString()} - \`${proposalVote.address}\` voted \`${choices[proposalVote.choice]}\`
-        `.trim();
+          const { address, choice, timestamp } = proposalVote;
+          const date = new Date(timestamp * 1000).toUTCString();
+          const chosenChoice = choices[choice];
+          return `${date} - \`${address}\` voted \`${chosenChoice}\``;
         });
 
         if (list.length === 0) {
           await interaction.editReply(`${details.data.title} doesn't have any votes.`);
-        } else if (list.length < 6) {
-          await interaction.editReply(`Votes for \`${details.data.title}\`: \n${list.join("\n")}`);
-        } else {
-          await interaction.editReply(`Votes for \`${details.data.title}\`: \n`);
-          const chunks = chunk(list, 6);
-          for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            await interaction.channel!.send(chunk.join("\n"));
-          }
+          return;
         }
 
+        let reply = `Votes for \`${details.data.title}\`:\n`;
+
+        if (list.length > LIMIT) {
+          reply += list.slice(0, LIMIT).join("\n");
+          reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/${details.data.protocol}/proposals/${refid}`;
+        } else {
+          reply = list.join("\n");
+        }
+        await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
@@ -184,27 +221,35 @@ From ${new Date(proposal.startTimestamp * 1000).toUTCString()} until ${new Date(
     ],
     handler: async ({ interaction, boardroomApi }) => {
       const address = interaction.options.getString('address', true);
+      const LIMIT = 10;
+
       try {
         await interaction.deferReply();
         const request = await boardroomApi.listVoterVotes(address);
         const voterVotes = request.data;
+        voterVotes.sort((a, b) => b.timestamp - a.timestamp);
+
         const list = voterVotes.map(voterVote => {
-          return `- Voted \`${voterVote.choice}\` in \`${voterVote.proposalInfo.title}\` (\`${voterVote.proposalRefId}\`) on ${new Date(voterVote.timestamp * 1000).toUTCString()}`;
+          const { choice, proposalRefId, timestamp, proposalInfo: { title } } = voterVote;
+          const date = new Date(timestamp * 1000).toUTCString();
+          return `- Voted \`${choice}\` in \`${title}\` (\`${proposalRefId}\`) on ${date}`;
         });
 
         if (list.length === 0) {
-          await interaction.editReply(`${address} has never voted.`);
-        } else if (list.length < 10) {
-          await interaction.editReply(`Votes by ${address}:\n${list}`);
-        } else {
-          await interaction.editReply(`Votes by ${address}:`);
-          const chunks = chunk(list, 10);
-          for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            await interaction.channel!.send(chunk.join("\n"));
-          }
+          await interaction.editReply(`\`${address}\` has never voted.`);
+          return;
         }
 
+        let reply = `Votes by \`${address}\`:\n`;
+
+        if (list.length > LIMIT) {
+          reply += list.slice(0, LIMIT).join("\n");
+          reply += `\n Plus ${list.length - LIMIT} more: https://app.boardroom.info/voter/${address}`;
+        } else {
+          reply = list.join("\n");
+        }
+
+        await interaction.editReply(reply);
       } catch (e) {
         await interaction.editReply(`ERROR: ${e.message}`);
       }
